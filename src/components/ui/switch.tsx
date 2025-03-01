@@ -21,13 +21,13 @@ const Switch = React.forwardRef<
     {/* Moon Icon  */}
     <Moon 
       className={cn(
-        'h-4 w-4 absolute z-[1000] top-[10px] left-[10px] stroke-gray-600 fill-white transition-opacity duration-300 ease-in-out', 'data-[state=checked]:opacity-100 data-[state=unchecked]:opacity-0'
+        'h-4 w-4 absolute z-[1000] top-[10px] left-[10px] stroke-gray-600 fill-white transition-opacity duration-300 ease-in-out','data-[state=checked]:opacity-100 data-[state=unchecked]:opacity-0'
       )}
     />
 
     <SwitchPrimitives.Thumb
       className={cn(
-        "pointer-events-none block h-7 w-7 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-8 data-[state=unchecked]:translate-x-0"
+        "pointer-events-none block h-7 w-7 rounded-full bg-background shadow-lg ring-0 transition-transform duration-300 ease-in-out data-[state=checked]:translate-x-8 data-[state=unchecked]:translate-x-0"
       )}
       
     />
