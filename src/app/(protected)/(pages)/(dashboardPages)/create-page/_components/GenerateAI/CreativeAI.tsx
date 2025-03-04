@@ -8,6 +8,10 @@ import { motion } from 'framer-motion'
 import { ChevronLeft, Loader2, RotateCcw } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
+import CardList from '../Common/CardList'
+import usePromptStore from '@/store/usePromptStore'
+import { toast } from 'sonner'
+import { generateCreativePrompt } from '@/actions/openai'
 
 type Props = {
     onBack: () => void
@@ -16,20 +20,21 @@ type Props = {
 const CreativeAI = ({ onBack }: Props) => {
 
     const [noOfCards, setNoOfCards] = useState(0)
-    const [editingCard, setEditiongCard] = useState<string | null>(null)
+    const [editingCard, setEditingCard] = useState<string | null>(null)
     const [isGenerating, setIsGenerating] = useState(false)
     const [selectCard, setSelectedCard] = useState<string | null>(null)
     const [editText, setEditText] = useState('')
 
     const router = useRouter()
-    const { currentAIPrompt, setCurrentPrompt, outlines, resetOutlines } = useCreativeAIStore()
+    const { currentAIPrompt, setCurrentPrompt, outlines, resetOutlines, addOutline, addMultipleOutlines } = useCreativeAIStore()
+    const { prompts, addPrompt } = usePromptStore()
 
     const handleBack = () => {
         onBack()
     }
 
     const resetCards = () => {
-        setEditiongCard(null)
+        setEditingCard(null)
         setSelectedCard(null)
         setEditText('')
 
@@ -37,7 +42,22 @@ const CreativeAI = ({ onBack }: Props) => {
         resetOutlines()
     }
 
-    const generateOutline = () => {}
+    const generateOutline = async() => {
+        if(currentAIPrompt == '') {
+            toast.error('Error', {
+                description: 'Please enter a prompt to generate an outline'
+            })
+            return 
+        }
+        setIsGenerating(true)
+        const res  = await generateCreativePrompt(currentAIPrompt)
+
+        //WIIP use open ai and complete this function
+    }
+
+    const handleGenerate = () => {
+
+    }
 
 
     return (
@@ -135,6 +155,41 @@ const CreativeAI = ({ onBack }: Props) => {
                     }
                 </Button>
             </div>
+            <CardList 
+                outlines={outlines} 
+                addOutline={addOutline}
+                addMultipleOutlines={addMultipleOutlines}
+                editingCard={editingCard}
+                selectedCard={selectCard}
+                editText={editText}
+                onEditChange={setEditText}
+                onCardSelect={setSelectedCard}
+                setEditingCard={setEditingCard}
+                setEditText={setEditText}
+                setSelectedCard={setSelectedCard}
+                onCardDoubleClick={(id, title) => {
+                    setEditingCard(id);
+                    setEditText(title);
+                }}
+            />
+            {outlines.length > 0 && (
+                <Button
+                    onClick={handleGenerate}
+                    className='w-full'
+                    disabled={isGenerating}
+                >
+                    {
+                        isGenerating ? (
+                            <>
+                                <Loader2 className='animate-spin mr-2' /> Generating...
+                            </>
+                        ) : (
+                            'Generate Presentation'
+                        )
+                    }
+                </Button>
+            )}
+            {/* {prompts.length > 0 && <RecentPrompts />} */}
         </motion.div>
     )
 }
