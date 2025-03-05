@@ -7,11 +7,16 @@ import useCreativeAIStore from '@/store/useCreativeAIStore'
 import { motion } from 'framer-motion'
 import { ChevronLeft, Loader2, RotateCcw } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import CardList from '../Common/CardList'
 import usePromptStore from '@/store/usePromptStore'
 import { toast } from 'sonner'
 import { generateCreativePrompt } from '@/actions/openai'
+import { OutlineCard } from '@/lib/types'
+import { v4 as uuidv4 } from 'uuid'
+import { createProject } from '@/actions/project'
+import { useSlideStore } from '@/store/useSlideStore'
+import RecentPrompts from './RecentPrompts'
 
 type Props = {
     onBack: () => void
@@ -28,6 +33,7 @@ const CreativeAI = ({ onBack }: Props) => {
     const router = useRouter()
     const { currentAIPrompt, setCurrentPrompt, outlines, resetOutlines, addOutline, addMultipleOutlines } = useCreativeAIStore()
     const { prompts, addPrompt } = usePromptStore()
+    const {setProject} = useSlideStore()
 
     const handleBack = () => {
         onBack()
@@ -42,22 +48,85 @@ const CreativeAI = ({ onBack }: Props) => {
         resetOutlines()
     }
 
-    const generateOutline = async() => {
-        if(currentAIPrompt == '') {
+    const generateOutline = async () => {
+        if (currentAIPrompt == '') {
             toast.error('Error', {
                 description: 'Please enter a prompt to generate an outline'
             })
-            return 
+            return
         }
         setIsGenerating(true)
-        const res  = await generateCreativePrompt(currentAIPrompt)
-
+        const res = await generateCreativePrompt(currentAIPrompt)
+        if (res.status === 200 && res?.data?.outlines) {
+            const cardsData: OutlineCard[] = []
+            res.data?.outlines.map((outline: string, index: number) => {
+                const newCard = {
+                    id: uuidv4(),
+                    title: outline,
+                    order: index + 1,
+                }
+                cardsData.push(newCard)
+            })
+            addMultipleOutlines(cardsData)
+            setNoOfCards(cardsData.length)
+            toast.success("Success", {
+                description: 'Outlines generated successfully'
+            })
+        } else {
+            toast.error("Error", {
+                description: 'Failed to generate outline. Please try again.',
+            })
+        }
         //WIIP use open ai and complete this function
+        setIsGenerating(false)
     }
 
-    const handleGenerate = () => {
+    const handleGenerate = async() => {
+        setIsGenerating(true)
+        if( outlines.length === 0){
+            toast.error('Error', {
+                description: 'Please add at least one card to generate slides'
+            })
+            return  
+        }
+        try{
+            const res = await createProject(
+                currentAIPrompt,
+                outlines.slice(0, noOfCards)
+            )
 
+            if(res.status !== 200 || !res.data){
+                throw new Error('Unable to create project.')
+            }
+            router.push(`/presentation/${res.data.id}/select-theme`)
+            setProject(res.data)
+
+            addPrompt({
+                id: uuidv4(),
+                title: currentAIPrompt || outlines?.[0]?.title,
+                outlines: outlines,
+                createdAt: new Date().toISOString(),
+            })
+
+            toast.success('Success', {
+                description: 'Project created successfully!'
+            })
+            setCurrentPrompt('')
+            resetOutlines()
+
+        } catch(error){
+            console.log(error)
+            toast.error("Error", {
+                description: 'Failed to create project.'
+            })
+        } finally {
+            setIsGenerating(false)
+        }
     }
+
+    useEffect(() => {
+        setNoOfCards(outlines.length)
+    }, [outlines.length])
 
 
     return (
@@ -82,7 +151,7 @@ const CreativeAI = ({ onBack }: Props) => {
                 <h1 className='text-4xl font-bold text-primary'>
                     Generate with <span className='text-vivid'>Creative AI</span>
                 </h1>
-                <p className='text-secondary'>What would you like to create today?</p>
+                <p className='text-black dark:text-gray-200'>What would you like to create today?</p>
             </motion.div>
             <motion.div
                 className='bg-primary/10 p-4 rounded-xl'
@@ -138,25 +207,25 @@ const CreativeAI = ({ onBack }: Props) => {
                 </div>
             </motion.div>
             <div className='w-full flex justify-center items-center'>
-                <Button 
+                <Button
                     onClick={generateOutline}
-                    className='font-medium text-lg flex gap-2 items-center'
+                    className='font-medium text-lg flex gap-2 items-center text-white dark:text-black'
                     disabled={isGenerating}
                 >
-                    {isGenerating ? 
-                    (
-                        <>
-                            <Loader2 className='animate-spin mr-2' />
-                            Generating...
-                        </>
-                    )
-                    : 
-                    'Generate Outline'
+                    {isGenerating ?
+                        (
+                            <>
+                                <Loader2 className='animate-spin mr-2' />
+                                Generating...
+                            </>
+                        )
+                        :
+                        'Generate Outline'
                     }
                 </Button>
             </div>
-            <CardList 
-                outlines={outlines} 
+            <CardList
+                outlines={outlines}
                 addOutline={addOutline}
                 addMultipleOutlines={addMultipleOutlines}
                 editingCard={editingCard}
@@ -175,7 +244,7 @@ const CreativeAI = ({ onBack }: Props) => {
             {outlines.length > 0 && (
                 <Button
                     onClick={handleGenerate}
-                    className='w-full'
+                    className='w-full text-white dark:text-black'
                     disabled={isGenerating}
                 >
                     {
@@ -189,7 +258,7 @@ const CreativeAI = ({ onBack }: Props) => {
                     }
                 </Button>
             )}
-            {/* {prompts.length > 0 && <RecentPrompts />} */}
+            {prompts.length > 0 && <RecentPrompts />}
         </motion.div>
     )
 }

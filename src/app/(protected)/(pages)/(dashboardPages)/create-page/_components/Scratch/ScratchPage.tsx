@@ -168,14 +168,14 @@ const ScratchPage = ({ onBack }: Props) => {
             <Button
                 onClick={handleAddCard}
                 variant={'secondary'}
-                className='w-full bg-primary-10'
+                className='w-full bg-gray-100 text-black'
             >
                 Add Cad
             </Button>
             {
                 outlines?.length > 0 && (
                     <Button
-                        className='w-full'
+                        className='w-full text-white'
                         onClick={handleGenerate}
                     >
                         Generate PPT

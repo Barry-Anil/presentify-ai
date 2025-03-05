@@ -40,7 +40,7 @@ const AddCardButton = ({onAddCard}: Props) => {
               onClick={onAddCard}
               aria-label='Add new card'
             >
-              <Plus className='h-4 w-4 text-black'/>
+              <Plus className='h-4 w-4 text-white dark:text-black'/>
             </Button>
             <div className='w-[40%] h-[1px] bg-primary'/>
           </motion.div>

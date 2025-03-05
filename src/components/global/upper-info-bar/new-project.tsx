@@ -14,7 +14,7 @@ const NewProjectButton = ({user}: {user: User}) => {
   return (
     <Button
        
-        className='rounded-lg font-semibold text-white'
+        className='rounded-lg font-semibold text-white dark:text-black'
         disabled={!user.subscription}
         onClick={()=> router.push('/create-page')}
     >
