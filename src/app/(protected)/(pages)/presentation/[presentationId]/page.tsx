@@ -54,7 +54,7 @@ const Page = (props: Props) => {
     }
 
     return (
-        <DndProvider>
+        <DndProvider backend={HTML5Backend}>
 
         </DndProvider>
     )

@@ -82,7 +82,7 @@ const CreatePage = ({onSelectOption}: Props) => {
                       variant={option.highlight ? 'default' : 'outline'}
                       onClick={() => onSelectOption(option.type)}
                       size={'sm'}
-                      className='w-fit rounded-xl font-bold'
+                      className='w-fit rounded-xl font-bold text-white dark:text-black'
                     >
                       {option.highlight ? 'Generate': 'Continue'}
                     </Button>
