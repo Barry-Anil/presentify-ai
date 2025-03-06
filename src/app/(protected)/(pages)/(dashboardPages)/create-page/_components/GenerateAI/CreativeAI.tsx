@@ -98,8 +98,7 @@ const CreativeAI = ({ onBack }: Props) => {
             if(res.status !== 200 || !res.data){
                 throw new Error('Unable to create project.')
             }
-            // router.push(`/presentation/${res.data.id}/select-theme`)
-            router.push(`/presentation/${res.data.id}`)
+            router.push(`/presentation/${res.data.id}/select-theme`)
 
             setProject(res.data)
 

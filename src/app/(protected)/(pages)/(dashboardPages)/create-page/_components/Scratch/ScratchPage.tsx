@@ -71,8 +71,7 @@ const ScratchPage = ({ onBack }: Props) => {
             toast.success('Success', {
                 description: "Project crated successfully!",
             })
-            // router.push(`/presentation/${res.data.id}/select-theme`)
-            router.push(`/presentation/${res.data.id}`)
+            router.push(`/presentation/${res.data.id}/select-theme`)
         } else {
             toast.error('Error', {
                 description: 'Failed to create project',
