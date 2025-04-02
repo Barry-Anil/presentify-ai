@@ -35,8 +35,8 @@ const Paragraph = React.forwardRef<HTMLTextAreaElement, ParagraphProps>(({classN
                 margin: 0,
                 color: 'inherit',
                 boxSizing: 'content-box',
-                lineHeight: '1.2em',
-                minHeight: '1.2em',
+                lineHeight: '1.5em',
+                minHeight: '1.5em',
                 ...styles,
             }}
             ref={(el) => {

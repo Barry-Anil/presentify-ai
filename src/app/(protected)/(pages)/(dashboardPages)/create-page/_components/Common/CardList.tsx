@@ -25,7 +25,7 @@ const CardList = ({
     selectedCard,
     editingCard,
     editText,
-    addOutline,
+    // addOutline,
     onEditChange,
     onCardSelect,
     onCardDoubleClick,
@@ -71,7 +71,7 @@ const CardList = ({
     }
 
     const onCardUpdate = (id: string, newTitle: string) => {
-        addMultipleOutlines(outlines.map((card, index) => (card.id === id ? { ...card, title: newTitle } : card)))
+        addMultipleOutlines(outlines.map((card) => (card.id === id ? { ...card, title: newTitle } : card)))
         setEditText('')
         setEditingCard(null)
         setSelectedCard(null)

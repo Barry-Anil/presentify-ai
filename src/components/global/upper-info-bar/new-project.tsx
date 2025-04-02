@@ -5,7 +5,6 @@ import { Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React from 'react'
 
-type Props = {}
 
 const NewProjectButton = ({user}: {user: User}) => {
 

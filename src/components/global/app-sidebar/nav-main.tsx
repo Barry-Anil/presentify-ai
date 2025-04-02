@@ -1,11 +1,9 @@
 "use client"
 import { SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar'
-import { Clock } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React from 'react'
 
-type Props = {}
 
 const NavMain = ({ items }: {
   items: {

@@ -8,9 +8,9 @@ import { motion } from 'framer-motion'
 import React from 'react'
 import { toast } from 'sonner'
 
-type Props = {}
 
-const RecentPrompts = (props: Props) => {
+
+const RecentPrompts = () => {
     const { prompts, setPage } = usePromptStore()
     const { addMultipleOutlines, setCurrentPrompt } = useCreativeAIStore()
 

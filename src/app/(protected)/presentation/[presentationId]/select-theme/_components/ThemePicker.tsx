@@ -57,6 +57,7 @@ const ThemePicker = ({
             setSlides(res.data)
 
         } catch (error) {
+            console.error(error)
             toast.error('Error', {
                 description: "Failed to generate layouts"
             })

@@ -58,6 +58,7 @@ const ProjectCard = ({ projectId, title, createdAt, isDeleted, slideData, src,  
                 description: "Project recovered successfully!"
             })
         } catch (error) {
+            console.log(error)
             toast.error('Oppse!', {
                 description: "Something went wwrong. Please contact support."
             })
@@ -87,6 +88,7 @@ const ProjectCard = ({ projectId, title, createdAt, isDeleted, slideData, src,  
                 description: "Project deleted successfully!"
             })
         } catch (error) {
+            console.log(error)
             toast.error('Oppse!', {
                 description: "Something went wwrong. Please contact support."
             })
@@ -102,10 +104,11 @@ const ProjectCard = ({ projectId, title, createdAt, isDeleted, slideData, src,  
                 className='relative aspect-[16/10] overflow-hidden rounded-lg cursor-pointer'
                 onClick={handleNavigation}
             >
-                {/* <ThumbnailPreview
+                <ThumbnailPreview
                     theme={theme}
-                // slides={JSON.parse(JSON.stringify(slideData))?.[0]}
-                /> */}
+                    slide={JSON.parse(JSON.stringify(slideData))?.[0]}
+                    src={src || ''}
+                />
 
             </div>
             <div className='w-full'>
@@ -123,7 +126,7 @@ const ProjectCard = ({ projectId, title, createdAt, isDeleted, slideData, src,  
                         {isDeleted ? (
                             <AlertDialogBox
                                 description='This will recover your project and restore your data.'
-                                className='bg-green-500 text-white dark:bg-green-600 hover:bg-green-600 dark:bg-green-700'
+                                className='bg-green-500 text-white dark:bg-green-600 hover:bg-green-600 dark:hover:bg-green-700'
                                 loading={loading}
                                 open={open}
                                 onClick={handleRecover}
@@ -141,7 +144,7 @@ const ProjectCard = ({ projectId, title, createdAt, isDeleted, slideData, src,  
                         ) : (
                             <AlertDialogBox
                                 description='This will delete your project and send to trash.'
-                                className='bg-red-500 text-white dark:bg-red-600 hover:bg-red-600 dark:bg-red-700'
+                                className='bg-red-500 text-white dark:bg-red-600 hover:bg-red-600 dark:hover:bg-red-700'
                                 loading={loading}
                                 open={open}
                                 onClick={handleDelete}

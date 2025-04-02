@@ -2,9 +2,9 @@ import React from 'react'
 import NODATA from '../../../../public/images/no-data.jpg'
 
 import Image from 'next/image'
-type Props = {}
 
-const NotFound = (props: Props) => {
+
+const NotFound = () => {
   return (
     <div className='flex flex-col min-h-[70vh] w-full justify-center items-center gap-12'>
         {/* <StrokeEarth /> */}

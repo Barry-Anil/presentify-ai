@@ -3,9 +3,8 @@ import { Input } from '@/components/ui/input'
 import { Search } from 'lucide-react'
 import React from 'react'
 
-type Props = {}
 
-const SearchBar = (props: Props) => {
+const SearchBar = () => {
   return (
     <div className='min-w-[60%] relative flex items-center border rounded-full bg-primary-90'>
         <Button

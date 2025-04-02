@@ -1,8 +1,8 @@
 import { redirect } from 'next/navigation'
 
-type Props = {}
 
-const Page = (props: Props) => {
+
+const Page = () => {
   redirect('/dashboard')
 }
 

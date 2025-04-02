@@ -1,17 +1,18 @@
-"use client"
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Skeleton } from '@/components/ui/skeleton'
-import { LayoutSlides } from '@/lib/types'
-import { cn } from '@/lib/utils'
-import { useSlideStore } from '@/store/useSlideStore'
-import React, { useEffect, useRef, useState } from 'react'
-import { useDrop } from 'react-dnd'
-import { v4 as uuidv4 } from 'uuid';
-import DraggableSlide from './DraggableSlide'
+"use client";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
+import { LayoutSlides } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import { useSlideStore } from "@/store/useSlideStore";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useDrop } from "react-dnd";
+import { v4 as uuidv4 } from "uuid";
+import DraggableSlide from "./DraggableSlide";
+import { updateSlides } from "@/actions/project";
 
 type Props = {
-  isEditable: boolean
-}
+  isEditable: boolean;
+};
 
 type DropZoneProps = {
   index: number;
@@ -23,49 +24,51 @@ type DropZoneProps = {
       index?: number;
     },
     dropIndex: number
-  ) => void
-  isEditable: boolean
-}
+  ) => void;
+  isEditable: boolean;
+};
 
 export const DropZone: React.FC<DropZoneProps> = ({
   index,
   onDrop,
-  isEditable
+  isEditable,
 }) => {
-
   const [{ isOver, canDrop }, dropRef] = useDrop({
-    accept: ['SLIDE', 'layout'],
+    accept: ["SLIDE", "layout"],
     drop: (item: {
-      type: string
-      layoutType: string
-      component: LayoutSlides
-      index?: number
+      type: string;
+      layoutType: string;
+      component: LayoutSlides;
+      index?: number;
     }) => {
-      onDrop(item, index)
+      onDrop(item, index);
     },
     canDrop: () => isEditable,
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
-      canDrop: monitor.canDrop()
-    })
-  })
+      canDrop: monitor.canDrop(),
+    }),
+  });
 
-  if (!isEditable) return null
+  if (!isEditable) return null;
 
   return (
-    <div className={cn(
-      'h-4 my-2 rounded-md transition-all duration-200',
-      isOver && canDrop ? 'border-green-200 bg-green-100' : 'border-gray-300',
-      canDrop ? 'border-blue-300' : 'border-gray-300'
-    )}>
+    <div
+      ref={dropRef as unknown as React.RefObject<HTMLDivElement>}
+      className={cn(
+        "border-border h-4 my-2 rounded-md transition-all duration-200",
+        isOver && canDrop ? "border-green-200 bg-green-100" : "border-gray-300",
+        canDrop ? "border-blue-300" : "border-gray-300"
+      )}
+    >
       {isOver && canDrop && (
-        <div className='h0full flex items-center justify-center text-green-600'>
+        <div className="h-full flex items-center justify-center text-green-600">
           Drop Here
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
 const Editor = ({ isEditable }: Props) => {
   const {
@@ -75,91 +78,123 @@ const Editor = ({ isEditable }: Props) => {
     addSlideAtIndex,
     reorderSlides,
     slides,
-    project
-  } = useSlideStore()
+    project,
+  } = useSlideStore();
 
-  const orderedSlides = getOrderSlides()
-  const slideRefs = useRef<(HTMLDivElement | null)[]>([])
-  const [loading, setLoading] = useState(true)
+  const orderedSlides = getOrderSlides();
+  const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const moveSlide = (dragIndex: number, hoverIndex: number) => {
     if (isEditable) {
-      reorderSlides(dragIndex, hoverIndex)
+      reorderSlides(dragIndex, hoverIndex);
     }
-  }
+  };
 
-
-
-  const handleDrop = (item: { type: string, layoutType: string, component: LayoutSlides, index?: number }, dropIndex: number) => {
-    if (!isEditable) return
-    if (item.type === 'layout') {
-      addSlideAtIndex({
-        ...item.component,
-        id: uuidv4(),
-        slideOrder: dropIndex
-      },
+  const handleDrop = (
+    item: {
+      type: string;
+      layoutType: string;
+      component: LayoutSlides;
+      index?: number;
+    },
+    dropIndex: number
+  ) => {
+    if (!isEditable) return;
+    if (item.type === "layout") {
+      addSlideAtIndex(
+        {
+          ...item.component,
+          id: uuidv4(),
+          slideOrder: dropIndex,
+        },
         dropIndex
-      )
-    } else if (item.type === 'SLIDE' && item.index !== undefined) {
-      moveSlide(item.index, dropIndex)
+      );
+    } else if (item.type === "SLIDE" && item.index !== undefined) {
+      moveSlide(item.index, dropIndex);
     }
-  }
-
-
+  };
 
   const handleDelete = (id: string) => {
     if (isEditable) {
-      console.log('Deleting', id)
-      removeSlide(id)
+      console.log("Deleting", id);
+      removeSlide(id);
     }
-  }
+  };
+
+  const saveSlides = useCallback(() => {
+    if (isEditable && project) {
+      (async () => {
+        await updateSlides(project.id, JSON.parse(JSON.stringify(slides)));
+      })();
+    }
+  }, [isEditable, slides, project]);
 
   useEffect(() => {
     if (slideRefs.current[currentSlide]) {
       slideRefs.current[currentSlide].scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      })
+        behavior: "smooth",
+        block: "center",
+      });
     }
-  }, [currentSlide])
+  }, [currentSlide]);
 
   useEffect(() => {
-    if(typeof window !== 'undefined') setLoading(false)
-  },[])
+    if (typeof window !== "undefined") setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current);
+    }
+    if (isEditable) {
+      autoSaveTimeoutRef.current = setTimeout(() => {
+        saveSlides();
+      }, 2000);
+    }
+
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+      }
+    };
+  }, [slides, isEditable, project, saveSlides]);
 
   return (
-    <div className='flex-1 flex flex-col h-full max-w-3xl mx-auto px-4 mb-20'>
-      {
-        loading ? (
-          <div className='w-full px-4 flex flex-col space-y-6'>
-            <Skeleton className='h-52 w-full' />
-            <Skeleton className='h-52 w-full' />
-            <Skeleton className='h-52 w-full' />
-
+    <div className="flex-1 flex flex-col h-full max-w-3xl mx-auto px-4 mb-20">
+      {loading ? (
+        <div className="w-full px-4 flex flex-col space-y-6">
+          <Skeleton className="h-52 w-full" />
+          <Skeleton className="h-52 w-full" />
+          <Skeleton className="h-52 w-full" />
+        </div>
+      ) : (
+        <ScrollArea className="flex-1 mt-8">
+          <div className="px-4 pb-4 space-y-4 pt-2">
+            {isEditable && (
+              <DropZone index={0} onDrop={handleDrop} isEditable={isEditable} />
+            )}
+            {orderedSlides.map((slide, index) => (
+              <React.Fragment key={slide.id || index}>
+                <DraggableSlide
+                  slide={slide}
+                  index={index}
+                  moveSlide={moveSlide}
+                  handleDelete={handleDelete}
+                  isEditable={isEditable}
+                />
+                {isEditable && (
+                  <DropZone index={index + 1} onDrop={handleDrop} isEditable={isEditable} />
+                )}
+              </React.Fragment>
+            ))}
           </div>
-        ) : (
-          <ScrollArea className='flex-1 mt-8'>
-            <div className='px-4 pb-4 space-y-4 pt-2'>
-              {isEditable && <DropZone index={0} onDrop={handleDrop} isEditable={isEditable} />}
-              {orderedSlides.map((slide, index) => (
-                <React.Fragment
-                  key={slide.id || index}
-                >
-                  <DraggableSlide
-                    slide={slide}
-                    index={index}
-                    moveSlide={moveSlide}
-                    handleDelete={handleDelete}
-                    isEditable={isEditable}
-                  />
-                </React.Fragment>
-              ))}
-            </div>
-          </ScrollArea>
-        )
-      }
+        </ScrollArea>
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default Editor
+export default Editor;

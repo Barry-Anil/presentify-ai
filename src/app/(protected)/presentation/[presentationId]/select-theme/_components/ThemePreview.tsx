@@ -11,9 +11,9 @@ import ThemeCard from "./ThemeCard"
 import ThemePicker from "./ThemePicker"
 import { themes } from "@/lib/constants"
 
-type Props = {}
 
-const ThemePreview = (props: Props) => {
+
+const ThemePreview = () => {
     const router = useRouter()
     const params = useParams()
     const { currentTheme, project, setCurrentTheme } = useSlideStore()
@@ -25,7 +25,7 @@ const ThemePreview = (props: Props) => {
             redirect(`/presentation/${params.presentationId}`)
         }
 
-    }, [project])
+    }, [project, params.presentationId])
 
     useEffect(() => {
         controls.start('visible')

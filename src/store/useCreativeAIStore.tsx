@@ -1,4 +1,4 @@
-import { OutlineCard, Slide } from '@/lib/types'
+import { OutlineCard } from '@/lib/types'
 import {create} from 'zustand'
 import {persist} from 'zustand/middleware'
 

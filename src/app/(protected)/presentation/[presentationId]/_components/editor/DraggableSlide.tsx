@@ -2,7 +2,7 @@ import { Slide } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { useSlideStore } from '@/store/useSlideStore'
 import React, { useRef } from 'react'
-import { useDrag } from 'react-dnd'
+import { useDrag, useDrop } from 'react-dnd'
 import { MasterRecursiveComponent } from './MasterRecursiveComponent'
 import { Popover, PopoverContent, PopoverTrigger, } from '@/components/ui/popover'
 import { Button } from '@/components/ui/button'
@@ -43,6 +43,27 @@ const DraggableSlide: React.FC<Props> = ({ slide, index, moveSlide, handleDelete
         updateContentItem(slide.id, contentId, newContent)
        }
     }
+ // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [_, drop] = useDrop({
+        accept: ['SLIDE', 'LAYOUT'],
+        hover(item: { type: string, index: number }) {
+            if(!ref.current || !isEditable){
+                return
+            }
+            const dragIndex = item.index
+            const hoverIndex = index
+
+            if(item.type === 'SLIDE'){
+                if(dragIndex === hoverIndex){
+                    return
+                }
+                moveSlide(dragIndex, hoverIndex)
+                item.index = hoverIndex
+            }
+        }
+    })
+
+    drag(drop(ref))
 
   return (
     <div 

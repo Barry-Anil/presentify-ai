@@ -12,10 +12,10 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import Navbar from './_components/Navbar/Navbar'
 import LayoutPreview from './_components/editor-sidebar/leftsidebar/LayoutPreview'
 import Editor from './_components/editor/Editor'
+import EditorSidebar from './_components/right-sidebar'
 
-type Props = {}
 
-const Page = (props: Props) => {
+const Page = () => {
     // WIP : create the presentation view page
     const { setSlides, setProject, currentTheme, setCurrentTheme } = useSlideStore()
     const params = useParams();
@@ -39,6 +39,7 @@ const Page = (props: Props) => {
                 setProject(res.data)
                 setSlides(JSON.parse(JSON.stringify(res.data.slides)))
             } catch (error) {
+                console.error(error)
                 toast.error('Error', {
                     description: 'An unexpected error occured.'
                 })
@@ -46,7 +47,7 @@ const Page = (props: Props) => {
                 setIsloading(false)
             }
         })()
-    }, [])
+    }, [params.presentationId, setProject, setCurrentTheme, setTheme, setSlides])
 
     if (isLoading) {
         return (
@@ -74,6 +75,7 @@ const Page = (props: Props) => {
                     >   
                         <Editor isEditable={true} />
                     </div>
+                    <EditorSidebar />
                 </div>
             </div>
         </DndProvider>

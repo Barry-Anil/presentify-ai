@@ -11,7 +11,8 @@ interface HeadingProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement>
 
 const createHeading = (displayName: string, defaultClassName: string) => {
     const Heading = React.forwardRef<HTMLTextAreaElement, HeadingProps>(
-        ({children, styles, isPreview = false, className, ...props}, ref) => {
+        // add children
+        ({ styles, isPreview = false, className, ...props}, ref) => {
             const textareaRef = React.useRef<HTMLTextAreaElement>(null)
             useEffect(() => {
                 const textarea = textareaRef.current
@@ -50,6 +51,7 @@ const createHeading = (displayName: string, defaultClassName: string) => {
                         if(typeof ref === 'function') ref(el)
                         else if (ref) ref.current = el
                     }}
+                    readOnly={isPreview}
                     {...props}
                 />
             )
