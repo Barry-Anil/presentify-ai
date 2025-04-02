@@ -186,7 +186,7 @@ const ContentRenderer: React.FC<Props> = React.memo(
             />
           </motion.div>
         );
-      case "callOutBox":
+      case "calloutBox":
         return (
           <motion.div className="w-full h-full" {...animationProps}>
             <CallOutBox
